@@ -27,7 +27,8 @@ class Knight(Piece):
         return False'''
 
     def can_kill(self, other_piece, board):
+        if not other_piece: return False
         return self.can_move(other_piece.x, other_piece.y, board)
 
-        from piece import Piece
+        
 

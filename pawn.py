@@ -20,6 +20,7 @@ class Pawn(Piece):
         return False  # No other valid moves
 
     def can_kill(self, other_piece, board):
+        if not other_piece: return False
         direction = 1 if self.side == 'white' else -1
         # Check for diagonal capture
         return abs(other_piece.x - self.x) == 1 and other_piece.y - self.y == direction and \
