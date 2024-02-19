@@ -52,7 +52,8 @@ class Chess:
     
     def move(self, start_x, start_y, end_x, end_y):
         piece = self.board[start_x][start_y]
-        if piece is not None and piece.can_move(end_x, end_y, self.board):
+        if not piece: return False
+        if piece.side==self.player and piece.can_move(end_x, end_y, self.board):
             if self.board[end_x][end_y] and piece.can_kill(self.board[end_x][end_y], self.board):
                 self.board[end_x][end_y] = None  # Remove the killed piece
             self.board[end_x][end_y] = piece
@@ -110,10 +111,10 @@ class Chess:
         return r1
 
     def play(self):
-        current_side = 'white'
+        self.player = 'white'
         while True:
             self.print_board()
-            print(f"{current_side.capitalize()}'s turn:")
+            print(f"{self.player.capitalize()}'s turn:")
 
             try:
                 start_x, start_y = map(int, input("Enter start coordinates (x,y): ").split(','))
@@ -125,14 +126,14 @@ class Chess:
             if self.move(start_x, start_y, end_x, end_y):
                 if self.game_over():
                     self.print_board()
-                    print(f"{current_side.capitalize()} wins!")
+                    print(f"{self.player.capitalize()} wins!")
                     break
-                elif self.checkmate(current_side):
+                elif self.checkmate(self.player):
                     self.print_board()
-                    print(f"{current_side.capitalize()} is in checkmate!")
+                    print(f"{self.player.capitalize()} is in checkmate!")
                     break
                 else:
-                    current_side = 'black' if current_side == 'white' else 'white'
+                    self.player = 'black' if self.player == 'white' else 'white'
             else:
                 print("Illegal move. Try again.")
 
