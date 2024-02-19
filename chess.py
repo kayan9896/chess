@@ -79,6 +79,7 @@ class Chess:
 
     def checkmate(self, side):
         king_x, king_y = None, None
+        r1=False
         for i in range(8):
             for j in range(8):
                 piece = self.board[i][j]
@@ -90,10 +91,13 @@ class Chess:
 
         # Check if the king is in check
         for i in range(8):
+            if r1:
+                break
             for j in range(8):
                 piece = self.board[i][j]
                 if piece is not None and piece.side != side and piece.can_kill(King(king_x, king_y, side), self.board):
-                    return True
+                    r1=True
+                    break
 
         # Check if the king can move to any safe square
         for i in range(-1, 2):
@@ -103,36 +107,37 @@ class Chess:
                     self.move(king_x + i, king_y + j, king_x, king_y)  # Undo the move
                     return False
 
-        return True
+        return r1
 
     def play(self):
-        self.initialize_board()
-        turn = 'white'
-
-        while not self.game_over():
+        current_side = 'white'
+        while True:
             self.print_board()
-            print(f"{turn.capitalize()}'s turn to move.")
+            print(f"{current_side.capitalize()}'s turn:")
 
-            while True:
-                try:
-                    start_x, start_y, end_x, end_y = map(int, input("Enter move (start_x start_y end_x end_y): ").split())
-                    if self.move(start_x, start_y, end_x, end_y):
-                        break  # Move was successful
-                    else:
-                        print("Illegal move. Try again.")
-                except ValueError:
-                    print("Invalid input format. Try again.")
+            try:
+                start_x, start_y = map(int, input("Enter start coordinates (x,y): ").split(','))
+                end_x, end_y = map(int, input("Enter end coordinates (x,y): ").split(','))
+            except ValueError:
+                print("Invalid input format. Please enter coordinates as x,y (e.g., 0,1)")
+                continue
 
-            if self.checkmate(turn):
-                print(f"Checkmate! {turn.capitalize()} loses.")
-                break
-
-            turn = 'black' if turn == 'white' else 'white'
-
-        self.print_board()  # Print the final board state
+            if self.move(start_x, start_y, end_x, end_y):
+                if self.game_over():
+                    self.print_board()
+                    print(f"{current_side.capitalize()} wins!")
+                    break
+                elif self.checkmate(current_side):
+                    self.print_board()
+                    print(f"{current_side.capitalize()} is in checkmate!")
+                    break
+                else:
+                    current_side = 'black' if current_side == 'white' else 'white'
+            else:
+                print("Illegal move. Try again.")
 
 if __name__ == "__main__":
     game = Chess()
+    game.initialize_board()
     game.play()
-
     
