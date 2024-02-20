@@ -5,6 +5,7 @@ from rook import Rook
 from bishop import Bishop
 from knight import Knight
 from pawn import Pawn
+from robot import Robot
 
     
 class Chess:
@@ -110,32 +111,80 @@ class Chess:
 
         return r1
 
+
     def play(self):
-        self.player = 'white'
-        while True:
-            self.print_board()
-            print(f"{self.player.capitalize()}'s turn:")
+        game_mode = input("Play against human or robot? (h/r): ")
+        if game_mode.lower() == 'r':
+            self.player = 'white'
+            while True:
+                self.print_board()
+                print(f"{self.player.capitalize()}'s turn:")
 
-            try:
-                start_x, start_y = map(int, input("Enter start coordinates (x,y): ").split(','))
-                end_x, end_y = map(int, input("Enter end coordinates (x,y): ").split(','))
-            except ValueError:
-                print("Invalid input format. Please enter coordinates as x,y (e.g., 0,1)")
-                continue
+                if self.player == 'black':  # Robot's turn
+                    robot = Robot('black')
+                    move = robot.get_move(self.board)
+                    if move:
+                        start_x, start_y, end_x, end_y = move
+                        print("Robot's move:", move)
+                        self.move(start_x, start_y, end_x, end_y)
+                    if self.game_over():
+                        self.print_board()
+                        print(f"{self.player.capitalize()} wins!")
+                        break
+                    elif self.checkmate(self.player):
+                        self.print_board()
+                        print(f"{self.player.capitalize()} is in checkmate!")
+                        break
+                    else:
+                        self.player = 'black' if self.player == 'white' else 'white'
+                    
+                else:  # Human's turn
+                    try:
+                        start_x, start_y = map(int, input("Enter start coordinates (x,y): ").split(','))
+                        end_x, end_y = map(int, input("Enter end coordinates (x,y): ").split(','))
+                    except ValueError:
+                        print("Invalid input format. Please enter coordinates as x,y (e.g., 0,1)")
+                        continue
 
-            if self.move(start_x, start_y, end_x, end_y):
-                if self.game_over():
-                    self.print_board()
-                    print(f"{self.player.capitalize()} wins!")
-                    break
-                elif self.checkmate(self.player):
-                    self.print_board()
-                    print(f"{self.player.capitalize()} is in checkmate!")
-                    break
+                    if self.move(start_x, start_y, end_x, end_y):
+                        if self.game_over():
+                            self.print_board()
+                            print(f"{self.player.capitalize()} wins!")
+                            break
+                        elif self.checkmate(self.player):
+                            self.print_board()
+                            print(f"{self.player.capitalize()} is in checkmate!")
+                            break
+                        else:
+                            self.player = 'black' if self.player == 'white' else 'white'
+                    else:
+                        print("Illegal move. Try again.")
+        else:
+            self.player = 'white'
+            while True:
+                self.print_board()
+                print(f"{self.player.capitalize()}'s turn:")
+
+                try:
+                    start_x, start_y = map(int, input("Enter start coordinates (x,y): ").split(','))
+                    end_x, end_y = map(int, input("Enter end coordinates (x,y): ").split(','))
+                except ValueError:
+                    print("Invalid input format. Please enter coordinates as x,y (e.g., 0,1)")
+                    continue
+
+                if self.move(start_x, start_y, end_x, end_y):
+                    if self.game_over():
+                        self.print_board()
+                        print(f"{self.player.capitalize()} wins!")
+                        break
+                    elif self.checkmate(self.player):
+                        self.print_board()
+                        print(f"{self.player.capitalize()} is in checkmate!")
+                        break
+                    else:
+                        self.player = 'black' if self.player == 'white' else 'white'
                 else:
-                    self.player = 'black' if self.player == 'white' else 'white'
-            else:
-                print("Illegal move. Try again.")
+                    print("Illegal move. Try again.")
 
 if __name__ == "__main__":
     game = Chess()
