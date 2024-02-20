@@ -23,7 +23,7 @@ class Pawn(Piece):
         if not other_piece: return False
         direction = 1 if self.side == 'white' else -1
         # Check for diagonal capture
-        return abs(other_piece.x - self.x) == 1 and other_piece.y - self.y == direction and \
+        return abs(other_piece.y - self.y) == 1 and other_piece.x - self.x == direction and \
                other_piece.side != self.side
 
     def enpassant(self, other_pawn, board):
