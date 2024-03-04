@@ -60,6 +60,7 @@ class Chess:
 
     def can_move(self, start, end):
         # Check if the start and end squares are valid
+        if start==end: return False
         if not self.is_valid_square(start) or not self.is_valid_square(end):
             return False
         
@@ -68,7 +69,7 @@ class Chess:
 
         # Get the piece type at the start square
         piece_type = self.get_piece_type(start_index)
-        if piece_type:
+        if piece_type and piece_type[0]==self.player:
             # Call the specific function based on the piece type
             if piece_type[1] == 'rook':
                 return self.rook_can_move(start_index, end_index)
@@ -111,7 +112,7 @@ class Chess:
         start_col = start_index % 8
         end_row = end_index // 8
         end_col = end_index % 8
-        
+        if start_row != end_row and start_col != end_col: return False
         if start_row == end_row:
             # Check if there are no pieces between start and end squares on the same row
             if start_col < end_col:
@@ -135,9 +136,8 @@ class Chess:
         
         # Check if the end square is occupied by a piece of the same side
         piece_type_at_end = self.get_piece_type(end_index)
-        if piece_type_at_end and piece_type_at_end[0] == self.player[0]:
+        if piece_type_at_end and piece_type_at_end[0] == self.player:
             return False
-        
         return True
 
     def bishop_can_move(self, start_index, end_index):
@@ -161,9 +161,8 @@ class Chess:
         
         # Check if the end square is either empty or occupied by an opponent's piece
         piece_type_at_end = self.get_piece_type(end_index)
-        if piece_type_at_end and piece_type_at_end[0] == self.player[0]:
+        if piece_type_at_end and piece_type_at_end[0] == self.player:
             return False
-        
         return True
 
     def queen_can_move(self, start_index, end_index):
@@ -177,7 +176,7 @@ class Chess:
         if diff in valid_moves:
             # Check if the end square is empty or occupied by an opponent's piece
             piece_type_at_end = self.get_piece_type(end_index)
-            if piece_type_at_end and piece_type_at_end[0] == self.player[0]:
+            if piece_type_at_end and piece_type_at_end[0] == self.player:
                 return False
             return True
         return False
@@ -189,7 +188,7 @@ class Chess:
         if diff in valid_moves:
             # Check if the end square is empty or occupied by an opponent's piece
             piece_type_at_end = self.get_piece_type(end_index)
-            if piece_type_at_end and piece_type_at_end[0] == self.player[0]:
+            if piece_type_at_end and piece_type_at_end[0] == self.player:
                 return False
             return True
         return False
@@ -209,7 +208,7 @@ class Chess:
             elif diff == 7 or diff == 9:
                 # Check if the pawn captures an opponent's piece diagonally
                 piece_type_at_end = self.get_piece_type(end_index)
-                if piece_type_at_end and piece_type_at_end[0] != self.player[0]:
+                if piece_type_at_end and piece_type_at_end[0] != self.player:
                     return True
         else:  # player is black
             if diff == -8:
@@ -223,13 +222,71 @@ class Chess:
             elif diff == -7 or diff == -9:
                 # Check if the pawn captures an opponent's piece diagonally
                 piece_type_at_end = self.get_piece_type(end_index)
-                if piece_type_at_end and piece_type_at_end[0] != self.player[0]:
+                if piece_type_at_end and piece_type_at_end[0] != self.player:
                     return True
         return False
 
     # Add more functions for other piece types as needed
 
+    def move(self, start, end):
+        # Check if the move is valid
+        if self.can_move(start, end):
+            start_index = self.square_to_index(start)
+            end_index = self.square_to_index(end)
+
+            # Move the piece
+            piece_type = self.get_piece_type(start_index)
+            if piece_type:
+                if self.player == 'white':
+                    piece_type_at_end = self.get_piece_type(end_index)
+                    if piece_type_at_end:
+                        self.black_pieces[piece_type_at_end[1]] &= ~(1 << end_index)
+                    self.white_pieces[piece_type[1]] &= ~(1 << start_index)
+                    self.white_pieces[piece_type[1]] |= (1 << end_index)
+                else:
+                    piece_type_at_end = self.get_piece_type(end_index)
+                    if piece_type_at_end:
+                        self.white_pieces[piece_type_at_end[1]] &= ~(1 << end_index)
+                    self.black_pieces[piece_type[1]] &= ~(1 << start_index)
+                    self.black_pieces[piece_type[1]] |= (1 << end_index)
+                print(self.black_pieces['king'])
+                return True
+        return False
+
+    def game_over(self):
+        # Check if one side's king is captured
+        if self.white_pieces['king'] == 0 or self.black_pieces['king'] == 0:
+            return True
+        return False
+
+    def play(self):
+        while not self.game_over():
+            # Print the board
+            self.print_board()
+
+            # Get player input
+            start = input(f"{self.player}'s turn. Enter the start square (e.g., 'a2'): ")
+            end = input(f"{self.player}'s turn. Enter the end square (e.g., 'a4'): ")
+
+            # Check if the move is valid and execute it
+            if self.move(start, end):
+                # Provide player feedback
+                print("Move successful!")
+                # Check if the game is over
+                if self.game_over():
+                    # Print the final board
+                    self.print_board()
+                    # Print the winner
+                    print(f"Game over! {self.player} wins!")
+                    break
+                self.player = 'black' if self.player == 'white' else 'white'
+            else:
+                # Provide player feedback
+                print("Invalid move! Please try again.")
+
+
 # Sample usage
 chess = Chess()
 chess.initialize_board()
-chess.print_board()
+chess.play()
+
