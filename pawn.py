@@ -6,6 +6,8 @@ class Pawn(Piece):
         self.has_moved = False  # Track if the pawn has made its initial move
 
     def can_move(self, end_x, end_y, board):
+        if self.can_kill(board[end_x][end_y],board):
+            return True
         direction = 1 if self.side == 'white' else -1  # White moves up, black moves down
 
         # Check for one-square forward move

@@ -70,10 +70,18 @@ class Chess:
         piece_type = self.get_piece_type(start_index)
         if piece_type:
             # Call the specific function based on the piece type
-            if piece_type == 'rook':
+            if piece_type[1] == 'rook':
                 return self.rook_can_move(start_index, end_index)
-            elif piece_type == 'knight':
+            elif piece_type[1] == 'knight':
                 return self.knight_can_move(start_index, end_index)
+            elif piece_type[1] == 'bishop':
+                return self.bishop_can_move(start_index, end_index)
+            elif piece_type[1] == 'queen':
+                return self.queen_can_move(start_index, end_index)
+            elif piece_type[1] == 'king':
+                return self.king_can_move(start_index, end_index)
+            elif piece_type[1] == 'pawn':
+                return self.pawn_can_move(start_index, end_index)
             # Add more piece types as needed
             
         return False
@@ -132,11 +140,93 @@ class Chess:
         
         return True
 
-    
+    def bishop_can_move(self, start_index, end_index):
+        # Check if start and end squares are on the same diagonal
+        start_row, start_col = divmod(start_index, 8)
+        end_row, end_col = divmod(end_index, 8)
+        if abs(start_row - end_row) != abs(start_col - end_col):
+            return False
+        
+        # Determine direction of movement
+        row_dir = 1 if end_row > start_row else -1
+        col_dir = 1 if end_col > start_col else -1
+        
+        # Check for obstacles on the diagonal path
+        row, col = start_row + row_dir, start_col + col_dir
+        while row != end_row:
+            if self.get_piece_type(row * 8 + col):
+                return False
+            row += row_dir
+            col += col_dir
+        
+        # Check if the end square is either empty or occupied by an opponent's piece
+        piece_type_at_end = self.get_piece_type(end_index)
+        if piece_type_at_end and piece_type_at_end[0] == self.player[0]:
+            return False
+        
+        return True
+
+    def queen_can_move(self, start_index, end_index):
+        # Check if the queen can move like a rook or a bishop
+        return self.rook_can_move(start_index, end_index) or self.bishop_can_move(start_index, end_index)
+
     def knight_can_move(self, start_index, end_index):
-        # Implement knight movement logic here
-        pass
-    
+        # Check if the move is a valid knight move
+        valid_moves = {10, 17, 15, 6, -10, -17, -15, -6}
+        diff = end_index - start_index
+        if diff in valid_moves:
+            # Check if the end square is empty or occupied by an opponent's piece
+            piece_type_at_end = self.get_piece_type(end_index)
+            if piece_type_at_end and piece_type_at_end[0] == self.player[0]:
+                return False
+            return True
+        return False
+
+    def king_can_move(self, start_index, end_index):
+        # Check if the move is a valid king move
+        valid_moves = {-9, -8, -7, -1, 1, 7, 8, 9}
+        diff = end_index - start_index
+        if diff in valid_moves:
+            # Check if the end square is empty or occupied by an opponent's piece
+            piece_type_at_end = self.get_piece_type(end_index)
+            if piece_type_at_end and piece_type_at_end[0] == self.player[0]:
+                return False
+            return True
+        return False
+
+    def pawn_can_move(self, start_index, end_index):
+        # Check if the move is a valid pawn move
+        diff = end_index - start_index
+        if self.player == 'white':
+            if diff == 8:
+                # Check if the end square is empty
+                if not self.get_piece_type(end_index):
+                    return True
+            elif diff == 16 and start_index // 8 == 1:
+                # Check if the pawn is in its initial position and the two cells in front are empty
+                if not self.get_piece_type(end_index) and not self.get_piece_type(end_index - 8):
+                    return True
+            elif diff == 7 or diff == 9:
+                # Check if the pawn captures an opponent's piece diagonally
+                piece_type_at_end = self.get_piece_type(end_index)
+                if piece_type_at_end and piece_type_at_end[0] != self.player[0]:
+                    return True
+        else:  # player is black
+            if diff == -8:
+                # Check if the end square is empty
+                if not self.get_piece_type(end_index):
+                    return True
+            elif diff == -16 and start_index // 8 == 6:
+                # Check if the pawn is in its initial position and the two cells in front are empty
+                if not self.get_piece_type(end_index) and not self.get_piece_type(end_index + 8):
+                    return True
+            elif diff == -7 or diff == -9:
+                # Check if the pawn captures an opponent's piece diagonally
+                piece_type_at_end = self.get_piece_type(end_index)
+                if piece_type_at_end and piece_type_at_end[0] != self.player[0]:
+                    return True
+        return False
+
     # Add more functions for other piece types as needed
 
 # Sample usage

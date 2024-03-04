@@ -55,8 +55,6 @@ class Chess:
         piece = self.board[start_x][start_y]
         if not piece: return False
         if piece.side==self.player and piece.can_move(end_x, end_y, self.board):
-            if self.board[end_x][end_y] and piece.can_kill(self.board[end_x][end_y], self.board):
-                self.board[end_x][end_y] = None  # Remove the killed piece
             self.board[end_x][end_y] = piece
             self.board[start_x][start_y] = None
             piece.x = end_x
@@ -81,12 +79,14 @@ class Chess:
 
     def checkmate(self, side):
         king_x, king_y = None, None
+        k=None
         r1=False
         for i in range(8):
             for j in range(8):
                 piece = self.board[i][j]
                 if isinstance(piece, King) and piece.side == side:
                     king_x, king_y = i, j
+                    k=piece
                     break
             if king_x is not None:
                 break
@@ -104,9 +104,7 @@ class Chess:
         # Check if the king can move to any safe square
         for i in range(-1, 2):
             for j in range(-1, 2):
-                if 0 <= king_x + i < 8 and 0 <= king_y + j < 8 and \
-                   self.move(king_x, king_y, king_x + i, king_y + j):
-                    self.move(king_x + i, king_y + j, king_x, king_y)  # Undo the move
+                if 0 <= king_x + i < 8 and 0 <= king_y + j < 8 and k.can_move(king_x + i, king_y + j,self.board):
                     return False
 
         return r1
