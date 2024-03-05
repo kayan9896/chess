@@ -1,3 +1,4 @@
+from ai import AI
 class Chess:
     def __init__(self):
         self.white_pieces = {
@@ -17,6 +18,7 @@ class Chess:
             'king': 0
         }
         self.player = 'white'
+        self.moves_history = []
 
     def initialize_board(self):
         # Place white pieces
@@ -233,7 +235,7 @@ class Chess:
         if self.can_move(start, end):
             start_index = self.square_to_index(start)
             end_index = self.square_to_index(end)
-
+            self.moves_history.append((start, end))
             # Move the piece
             piece_type = self.get_piece_type(start_index)
             if piece_type:
@@ -241,16 +243,48 @@ class Chess:
                     piece_type_at_end = self.get_piece_type(end_index)
                     if piece_type_at_end:
                         self.black_pieces[piece_type_at_end[1]] &= ~(1 << end_index)
+                        self.moves_history[-1]=(start, end, piece_type_at_end[1])
                     self.white_pieces[piece_type[1]] &= ~(1 << start_index)
                     self.white_pieces[piece_type[1]] |= (1 << end_index)
                 else:
                     piece_type_at_end = self.get_piece_type(end_index)
                     if piece_type_at_end:
                         self.white_pieces[piece_type_at_end[1]] &= ~(1 << end_index)
+                        self.moves_history[-1]=(start, end, piece_type_at_end[1])
                     self.black_pieces[piece_type[1]] &= ~(1 << start_index)
                     self.black_pieces[piece_type[1]] |= (1 << end_index)
-                print(self.black_pieces['king'])
                 return True
+        return False
+
+    def undo(self):
+        if self.moves_history:
+            last_move = self.moves_history.pop()
+            start, end = last_move[:2]
+            start_index = self.square_to_index(start)
+            end_index = self.square_to_index(end)
+
+            # Restore the moved piece
+            piece_type = self.get_piece_type(end_index)
+            if piece_type:
+                if self.player == 'black':
+                    self.white_pieces[piece_type[1]] &= ~(1 << end_index)
+                    self.white_pieces[piece_type[1]] |= (1 << start_index)
+                else:
+                    self.black_pieces[piece_type[1]] &= ~(1 << end_index)
+                    self.black_pieces[piece_type[1]] |= (1 << start_index)
+
+            # Restore captured piece if any
+            if len(last_move) == 3:
+                captured_piece = last_move[2]
+                if self.player == 'black':
+                    self.black_pieces[captured_piece] |= (1 << end_index)
+                else:
+                    self.white_pieces[captured_piece] |= (1 << end_index)
+
+            # Toggle player back
+            self.player = 'black' if self.player == 'white' else 'white'
+
+            return True
         return False
 
     def game_over(self):
@@ -260,33 +294,44 @@ class Chess:
         return False
 
     def play(self):
+        game_mode = input("Play against human or robot? (h/r): ")
+        ai=AI('black')
+        self.initialize_board()
         while not self.game_over():
-            # Print the board
             self.print_board()
-
-            # Get player input
-            start = input(f"{self.player}'s turn. Enter the start square (e.g., 'a2'): ")
-            end = input(f"{self.player}'s turn. Enter the end square (e.g., 'a4'): ")
-
-            # Check if the move is valid and execute it
-            if self.move(start, end):
-                # Provide player feedback
-                print("Move successful!")
-                # Check if the game is over
-                if self.game_over():
-                    # Print the final board
-                    self.print_board()
-                    # Print the winner
-                    print(f"Game over! {self.player} wins!")
-                    break
-                self.player = 'black' if self.player == 'white' else 'white'
+            if self.player == 'white' or (self.player == 'black' and game_mode=='h'):
+                start = input("Enter start position (e.g., 'a2'): ")
+                end = input("Enter end position (e.g., 'a4'): ")
+                # Check if the move is valid and execute it
+                if self.move(start, end):
+                    # Provide player feedback
+                    print("Move successful!")
+                    # Check if the game is over
+                    if self.game_over():
+                        # Print the final board
+                        self.print_board()
+                        # Print the winner
+                        print(f"Game over! {self.player} wins!")
+                        break
+                    self.player = 'black' if self.player == 'white' else 'white'
+                else:
+                    # Provide player feedback
+                    print("Invalid move! Please try again.")
             else:
-                # Provide player feedback
-                print("Invalid move! Please try again.")
+                # AI makes a move
+                bestmove = ai.get_move(self)
+                if bestmove:
+                    self.move(bestmove[0],bestmove[1])
+                    self.player = 'white'
+                    self.print_board()
+                else:
+                    print(f"Game over! white wins!")
+                    break
 
+        
 
 # Sample usage
 chess = Chess()
-chess.initialize_board()
 chess.play()
+
 
