@@ -1,38 +1,34 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Styling for cells */
+.cell {
+  width: 50px;
+  height: 50px;
+  border: 1px solid black;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+  font-size: 24px; /* Adjust font size as needed */
 }
 
-.App-link {
-  color: #61dafb;
+.white-cell {
+  background-color: white;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.black-cell {
+  background-color: gray;
+}
+
+.selected-cell {
+  background-color: yellow; /* Change background color for selected cells */
+}
+
+/* Styling for rows */
+.row {
+  display: flex;
+}
+
+/* Styling for board container */
+.board-container {
+  margin: auto; /* Center the board horizontally */
+  margin-top: 50px; /* Add margin from top to center vertically */
+  width: fit-content; /* Adjust width based on content */
 }
