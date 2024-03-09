@@ -64,6 +64,7 @@ function PlayAI() {
           setBoard(data.board);
           setMessage(data.message);
         } else {
+          setMessage('Invalid move.')
           throw new Error('Failed to make move');
         }
       } catch (error) {

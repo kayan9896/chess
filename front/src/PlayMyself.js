@@ -16,6 +16,7 @@ function PlayMyself() {
         const data = await response.json();
         setBoard(data.board);
         setId(data.id)
+        setMessage(data.message);
       } else {
         throw new Error('Failed to fetch board');
       }
@@ -33,36 +34,26 @@ function PlayMyself() {
       // Second cell clicked, send move request
       try {
         const move = `${String.fromCharCode(97 + selectedCell.col)}${8-selectedCell.row}-${String.fromCharCode(97 + col)}${8-row}`;
-        const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/move', {
+        const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/mov', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ move })
+          body: JSON.stringify({ move,id })
         });
         if (response.ok) {
           const data = await response.json();
           setBoard(data.board);
           setMessage(data.message);
         } else {
+          setMessage('Invalid move.');
           throw new Error('Failed to make move');
         }
       } catch (error) {
         console.error('Error making move:', error);
       }
       setSelectedCell(null); // Reset selected cell
-      try {
-        const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/getmove');
-        if (response.ok) {
-          const data = await response.json();
-          setBoard(data.board);
-          setMessage(data.message);
-        } else {
-          throw new Error('Failed to fetch board');
-        }
-      } catch (error) {
-        console.error('Error fetching board:', error);
-      }
+      
     }
   };
 

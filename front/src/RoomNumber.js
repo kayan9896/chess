@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Cell from './Cell';
 import './App.css';
 
@@ -6,71 +6,101 @@ function RoomNumber() {
   const [board, setBoard] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
   const [message, setMessage] = useState('');
+  const [number, setNumber] = useState('');
+  const [waiting, setWaiting] = useState(false);
+  const [side,setSide] = useState(null);
+  const white = new Set(["P","R","N",'B','Q','K']);
+  const black = new Set(["p","r","n",'b','q','k']);
 
-  // Function to start the game and fetch the initial board state
-  const startGame = async () => {
+  useEffect(() => {
+    const interval = setInterval(fetchBoard, 5000);
+    return () => clearInterval(interval);
+  });
+
+  async function joinGame(){
     try {
-      const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/start');
+      setWaiting(true);
+      const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ number })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setBoard(data.board);
+        setWaiting(false);
+        setSide(data.side)
+      } else {
+        throw new Error('Failed to join game');
+      }
+    } catch (error) {
+      console.error('Error joining game:', error);
+      setWaiting(false);
+    }
+  };
+
+  async function fetchBoard(){
+    if(!board) return;
+    try {
+      const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/board', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ number })
+      });
       if (response.ok) {
         const data = await response.json();
         setBoard(data.board);
       } else {
+        setMessage('Gameover')
         throw new Error('Failed to fetch board');
       }
     } catch (error) {
-      console.error('Error fetching board:', error);
+      console.error(error);
     }
-  };
+  }
 
   // Function to handle cell click
   const handleCellClick = async (row, col) => {
     if (!selectedCell) {
       // First cell clicked, store the position
+      console.log(board[row][col] in black)
+      console.log(side)
+      if((black.has(board[row][col]) && side===false) ||(white.has(board[row][col]) && side===true))
       setSelectedCell({ row, col });
     } else {
       // Second cell clicked, send move request
       try {
         const move = `${String.fromCharCode(97 + selectedCell.col)}${8-selectedCell.row}-${String.fromCharCode(97 + col)}${8-row}`;
-        const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/move', {
+        const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/mov', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ move })
+          body: JSON.stringify({ move,'id':number })
         });
         if (response.ok) {
           const data = await response.json();
           setBoard(data.board);
           setMessage(data.message);
         } else {
+          setMessage('Invalid move.');
           throw new Error('Failed to make move');
         }
       } catch (error) {
         console.error('Error making move:', error);
       }
       setSelectedCell(null); // Reset selected cell
-      try {
-        const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/getmove');
-        if (response.ok) {
-          const data = await response.json();
-          setBoard(data.board);
-          setMessage(data.message);
-        } else {
-          throw new Error('Failed to fetch board');
-        }
-      } catch (error) {
-        console.error('Error fetching board:', error);
-      }
+      
     }
   };
 
   return (
     <div className="App">
-      {/* Start button */}
-      <button onClick={startGame}>Start Game</button>
-
-      {/* Render board if available */}
-      {board && (
+      {board? (
         <div className="board-container">
           {board.map((row, rowIndex) => (
             <div key={rowIndex} className="row">
@@ -87,6 +117,19 @@ function RoomNumber() {
             </div>
           ))}
           <div className="message">{message}</div>
+        </div>
+      ): (
+        <div className="waiting-window">
+          <input
+            type="text"
+            placeholder="Enter number"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+          />
+          <button onClick={joinGame} disabled={number === '' || waiting}>
+            Join
+          </button>
+          {waiting && <p>Waiting for another player...</p>}
         </div>
       )}
     </div>
