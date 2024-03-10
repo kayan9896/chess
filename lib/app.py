@@ -3,6 +3,7 @@ import chess
 from ai import AI  # Assuming the AI class is implemented in a separate file named "ai.py"
 import uuid
 from flask_cors import CORS  # Import the CORS module
+import time
 
 app = Flask(__name__)
 CORS(app) 
@@ -96,12 +97,6 @@ def get_move(id):
         print(games)
     return jsonify({'board': to2d(game), "message":'Last move of AI: '+best_move.__str__() if best_move else ''+'\n'+gg}), 200
 
-import threading
-import time
-# Dictionary to store condition variables for each number
-condition_variables = {}
-# Lock for accessing game_data and condition_variables dictionaries
-lock = threading.Lock()
 
 @app.route('/join', methods=['POST'])
 def join_game():
@@ -125,6 +120,32 @@ def join_game():
             game = chess.Board()
             games[number]={'game': game,'p2':chess.BLACK}
             return jsonify({'board': to2d(game),'side':chess.BLACK}), 200
+
+def match():
+    while len(waitlist)>1:
+        p1=waitlist.pop()
+        p2=waitlist.pop()
+        game_id = str(uuid.uuid4())
+        game = chess.Board()
+        games[game_id]={'game': game,p1:chess.WHITE,p2:chess.BLACK}
+        assigned[p1]=game_id
+        assigned[p2]=game_id
+
+waitlist=[]
+assigned={}
+@app.route('/find', methods=['POST'])
+def find():
+    number = uuid.uuid4()
+    waitlist.append(number)
+    t=5
+    while t>0:
+        time.sleep(6)
+        t-=1
+        match()
+        if number in assigned:
+            return jsonify({'board': to2d(games[assigned[number]]['game']),'side': games[assigned[number]][number],'gameid':assigned[number]}), 200   
+    waitlist.remove(number)
+    return jsonify({'error': 'Timeout waiting for another player'}), 500
 
 
 if __name__ == "__main__":
