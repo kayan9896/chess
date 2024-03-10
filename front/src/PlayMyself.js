@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Cell from './Cell';
 import './App.css';
 
-function PlayMyself() {
+function PlayMyself({link}) {
   const [board, setBoard] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
   const [message, setMessage] = useState('');
@@ -11,7 +11,7 @@ function PlayMyself() {
   // Function to start the game and fetch the initial board state
   const startGame = async () => {
     try {
-      const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/start');
+      const response = await fetch(link+'/start');
       if (response.ok) {
         const data = await response.json();
         setBoard(data.board);
@@ -34,7 +34,7 @@ function PlayMyself() {
       // Second cell clicked, send move request
       try {
         const move = `${String.fromCharCode(97 + selectedCell.col)}${8-selectedCell.row}-${String.fromCharCode(97 + col)}${8-row}`;
-        const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/mov', {
+        const response = await fetch(link+'/mov', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

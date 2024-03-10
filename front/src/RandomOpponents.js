@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 import Cell from './Cell';
 import './App.css';
 
-function RandomOpponents() {
+function RandomOpponents({link}) {
   const [board, setBoard] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
   const [message, setMessage] = useState('');
@@ -20,7 +20,7 @@ function RandomOpponents() {
   async function joinGame(){
     try {
       setWaiting(true);
-      const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/find', {
+      const response = await fetch(link+'/find', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -45,7 +45,7 @@ function RandomOpponents() {
   async function fetchBoard(){
     if(!board) return;
     try {
-      const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/board', {
+      const response = await fetch(link+'/board', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ function RandomOpponents() {
       // Second cell clicked, send move request
       try {
         const move = `${String.fromCharCode(97 + selectedCell.col)}${8-selectedCell.row}-${String.fromCharCode(97 + col)}${8-row}`;
-        const response = await fetch('https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev/mov', {
+        const response = await fetch(link+'/mov', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

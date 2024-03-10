@@ -8,7 +8,8 @@ import RoomNumber from './RoomNumber';
 
 function App() {
   const [screen, setScreen] = useState('start');
-
+  const link1='https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev'
+  const link=link1
   // Render screen based on current state
   const renderScreen = () => {
     switch (screen) {
@@ -24,19 +25,19 @@ function App() {
         );
     case 'random':
         return (
-          <RandomOpponents/>
+          <RandomOpponents link={link}/>
         );
       case 'ai':
         return (
-          <PlayAI/>
+          <PlayAI link={link}/>
         );
       case 'me':
         return (
-         <PlayMyself/>
+         <PlayMyself link={link}/>
         );
         case 'room':
           return (
-           <RoomNumber/>
+           <RoomNumber link={link}/>
           );
       default:
         return null;
