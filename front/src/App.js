@@ -46,6 +46,7 @@ function App() {
 
   return (
     <div className="App">
+      <button onClick={function(){setScreen('start')}}>Main page</button>
       {/* Render current screen */}
       {renderScreen()}
     </div>

@@ -75,7 +75,10 @@ function RandomOpponents({link}) {
     } else {
       // Second cell clicked, send move request
       try {
-        const move = `${String.fromCharCode(97 + selectedCell.col)}${8-selectedCell.row}-${String.fromCharCode(97 + col)}${8-row}`;
+        let promo=''
+        if(board[selectedCell.row][selectedCell.col]==='p'&&selectedCell.row===6) promo='q'
+        if(board[selectedCell.row][selectedCell.col]==='P'&&selectedCell.row===1) promo='Q'
+        const move = `${String.fromCharCode(97 + selectedCell.col)}${8-selectedCell.row}-${String.fromCharCode(97 + col)}${8-row}${promo}`;
         const response = await fetch(link+'/mov', {
           method: 'POST',
           headers: {
