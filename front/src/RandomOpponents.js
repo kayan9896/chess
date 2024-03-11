@@ -125,8 +125,8 @@ function RandomOpponents({link}) {
       ): (
         <div className="waiting-window">
           
-          <button onClick={joinGame} disabled={waiting}>
-            Join
+          <button onClick={joinGame} disabled={waiting} >
+            Start searching
           </button>
           {waiting && <p>Waiting for another player...</p>}
         </div>

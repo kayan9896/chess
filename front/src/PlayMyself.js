@@ -63,7 +63,7 @@ function PlayMyself({link}) {
   return (
     <div className="App">
       {/* Start button */}
-      <button onClick={startGame}>Start Game</button>
+      {!board?<button onClick={startGame} style={{marginTop:'10%'}}>Start Game</button>:null}
 
       {/* Render board if available */}
       {board && (

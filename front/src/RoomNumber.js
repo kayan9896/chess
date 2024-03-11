@@ -127,7 +127,7 @@ function RoomNumber({link}) {
             value={number}
             onChange={(e) => setNumber(e.target.value)}
           />
-          <button onClick={joinGame} disabled={number === '' || waiting}>
+          <button onClick={joinGame} disabled={number === '' || waiting} >
             Join
           </button>
           {waiting && <p>Waiting for another player...</p>}

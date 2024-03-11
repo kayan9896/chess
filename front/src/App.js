@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Cell from './Cell';
 import './App.css';
 import PlayMyself from './PlayMyself';
@@ -11,16 +11,21 @@ function App() {
   const link1='https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev'
   const link='https://chess-owau.onrender.com/'
   // Render screen based on current state
+  window.addEventListener("beforeunload", (ev) => 
+{  
+    ev.preventDefault();
+    return ev.returnValue = 'Are you sure you want to close?';
+});
   const renderScreen = () => {
     switch (screen) {
       case 'start':
         return (
           <div className="start-screen">
             <h2>Choose Game Mode</h2>
-            <button onClick={() => setScreen('me')}>1. Play with myself</button>
-            <button onClick={() => setScreen('ai')}>2. Play with AI</button>
-            <button onClick={() => setScreen('random')}>3. Play with random players</button>
-            <button onClick={() => setScreen('room')}>4. Enter room number</button>
+            <button onClick={() => setScreen('me') } className="home-button">Play myself</button>
+            <button onClick={() => setScreen('ai')} className="home-button">Play with AI</button>
+            <button onClick={() => setScreen('random')} className="home-button">Find random players</button>
+            <button onClick={() => setScreen('room')} className="home-button">Enter room number</button>
           </div>
         );
     case 'random':

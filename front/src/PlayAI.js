@@ -34,11 +34,11 @@ function PlayAI({link}) {
   const renderScreen = () => {
     
         return (
-          <div className="difficulty-screen">
+          <div className="start-screen">
             <h2>Select Difficulty</h2>
-            <button onClick={() => startGame(1)}>Beginner</button>
-            <button onClick={() => startGame(3)}>Amateur</button>
-            <button onClick={() => startGame(5)}>Professional</button>
+            <button onClick={() => startGame(1)} className="home-button">Beginner</button>
+            <button onClick={() => startGame(3)} className="home-button">Amateur</button>
+            <button onClick={() => startGame(5)} className="home-button">Professional</button>
             
           </div>
         );
