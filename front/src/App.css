@@ -17,6 +17,14 @@
   font-size: 24px; /* Adjust font size as needed */
 }
 
+@media only screen and (max-width: 600px) {
+  .cell {
+    width: 30px; /* Adjust width for smaller screens */
+    height: 30px; /* Adjust height for smaller screens */
+    font-size: 16px; /* Adjust font size for smaller screens */
+  }
+}
+
 .white-cell {
   background-color: white;
 }

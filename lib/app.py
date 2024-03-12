@@ -34,7 +34,6 @@ def start_game():
     game_id = str(uuid.uuid4())
     game = chess.Board()
     games[game_id]={'game': game}
-    print(games)
     return jsonify({'board': to2d(game),'id':game_id,"message":'White turn'}), 200
 
 @app.route('/mov', methods=['POST'])
@@ -159,12 +158,12 @@ def find():
 @app.route('/clear', methods=['GET'])
 def clear():
     print(games)
-    time.sleep(40)
+    time.sleep(1800)
     rm=[]
     for i in games:
         if 'last' in games[i]:
             print(datetime.now().timestamp()-games[i]['last'])
-            if datetime.now().timestamp()-games[i]['last']>20:
+            if datetime.now().timestamp()-games[i]['last']>900:
                 rm.append(i)
     for j in rm:
         games.pop(j)
