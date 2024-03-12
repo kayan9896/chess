@@ -4,6 +4,7 @@ from ai import AI  # Assuming the AI class is implemented in a separate file nam
 import uuid
 from flask_cors import CORS  # Import the CORS module
 import time
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app) 
@@ -24,6 +25,8 @@ def board():
     if id not in games:
         return jsonify({'message': 'Gameover.'}), 400
     game=games[id]['game']
+    if game.is_game_over():
+        return jsonify({'board': to2d(game),'message': 'Gameover.'}), 200
     return jsonify({'board': to2d(game)}), 200
 
 @app.route('/start', methods=['GET'])
@@ -36,7 +39,12 @@ def start_game():
 @app.route('/mov', methods=['POST'])
 def make_mov():
     id=request.json.get('id')
+    time=request.json.get('time')
+    
+    if id not in games:
+        return jsonify({'message': 'Game not started. Use /start endpoint to start a new game.'}), 400
     game=games[id]['game']
+    games[id]['last']=time
     if not game:
         return jsonify({'message': 'Game not started. Use /start endpoint to start a new game.'}), 400
     
@@ -49,7 +57,6 @@ def make_mov():
     except ValueError:
         return jsonify({'message': 'Invalid move.'}), 400
     if game.is_game_over():
-        games.pop(id)
         return jsonify({'board': to2d(game), "message":'Gameover' }), 200
     return jsonify({'board': to2d(game), "message":'Last move: '+move +'\n' + ('black' if game.turn==chess.BLACK else 'white')+' turn' }), 200
 
@@ -64,10 +71,11 @@ def start_ai():
 @app.route('/move', methods=['POST'])
 def make_move():
     id=request.json.get('id')
-    game=games[id]['game']
-    if not game:
+    time=request.json.get('time')
+    if id not in games:
         return jsonify({'message': 'Game not started. Use /start endpoint to start a new game.'}), 400
-
+    game=games[id]['game']
+    games[id]['last']=time
     move = request.json.get('move')
     if not move:
         return jsonify({'message': 'Move parameter is missing.'}), 400
@@ -147,6 +155,19 @@ def find():
     waitlist.remove(number)
     return jsonify({'error': 'Timeout waiting for another player'}), 500
 
-
+@app.route('/clear', methods=['GET'])
+def clear():
+    print(games)
+    time.sleep(2400)
+    rm=[]
+    for i in games:
+        if 'last' in games[i]:
+            print(datetime.now().timestamp()-games[i]['last'])
+            if datetime.now().timestamp()-games[i]['last']>1200:
+                rm.append(i)
+    for j in rm:
+        games.pop(j)
+    print(games)
+    return 'rm'
 if __name__ == "__main__":
     app.run(debug=True)

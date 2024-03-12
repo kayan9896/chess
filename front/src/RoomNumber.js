@@ -11,6 +11,7 @@ function RoomNumber({link}) {
   const [side,setSide] = useState(null);
   const white = new Set(["P","R","N",'B','Q','K']);
   const black = new Set(["p","r","n",'b','q','k']);
+  const time = Math.floor(new Date().getTime()/ 1000);
 
   useEffect(() => {
     const interval = setInterval(fetchBoard, 5000);
@@ -81,7 +82,7 @@ function RoomNumber({link}) {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ move,'id':number })
+          body: JSON.stringify({ move,'id':number ,time})
         });
         if (response.ok) {
           const data = await response.json();

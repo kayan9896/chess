@@ -8,7 +8,8 @@ function PlayAI({link}) {
   const [message, setMessage] = useState('');
   const [screen, setScreen] = useState('start');
   const [id,setId]=useState('')
-
+  const time = Math.floor(new Date().getTime()/ 1000);
+  
   // Function to start the game and fetch the initial board state
   async function startGame (n){
   
@@ -60,7 +61,7 @@ function PlayAI({link}) {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ move,id })
+          body: JSON.stringify({ move,id,time })
         });
         if (response.ok) {
           const data = await response.json();

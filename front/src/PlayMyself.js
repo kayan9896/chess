@@ -7,7 +7,7 @@ function PlayMyself({link}) {
   const [selectedCell, setSelectedCell] = useState(null);
   const [message, setMessage] = useState('');
   const [id,setId]=useState('')
-
+  const time = Math.floor(new Date().getTime()/ 1000); // Get current time in ISO format
   // Function to start the game and fetch the initial board state
   const startGame = async () => {
     try {
@@ -42,7 +42,7 @@ function PlayMyself({link}) {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ move,id })
+          body: JSON.stringify({ move,id,time })
         });
         if (response.ok) {
           const data = await response.json();
