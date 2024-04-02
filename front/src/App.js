@@ -8,8 +8,9 @@ import RoomNumber from './RoomNumber';
 
 function App() {
   const [screen, setScreen] = useState('start');
-  const link1='https://shiny-eureka-9v76576wpgh9r95-5000.app.github.dev'
-  const link='https://chess-owau.onrender.com'
+  const link1='https://shiny-eureka-9v76576wpgh9r95-8000.app.github.dev'
+  const link=link1
+  //'https://chess-owau.onrender.com'
   // Render screen based on current state
   window.addEventListener("beforeunload", (ev) => 
 {  
